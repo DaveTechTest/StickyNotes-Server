@@ -135,7 +135,9 @@ Note.prototype = {
   close: function(event) {
     this.cancelPendingSave();
     var note = this;
-    db.remove(note.id);
+    var noteId = parseInt(note.id);
+    console.log(noteId);
+    postData('delete-note/'+ noteId, false);
     var duration = .25
     var self = this;
     setTimeout(function() { document.body.removeChild(self.note) }, duration * 1000);
@@ -228,30 +230,24 @@ Note.prototype = {
 /**
  * Fetch notes assigned to username
  */
-function loadNotes(username) {
+function loadNotes() {
   
   var noteArr = getData('read-note/');
-  console.log(noteArr);
-  return;
+  if(noteArr != false && noteArr != "") noteArr = JSON.parse(noteArr); 
   for (var i=0; i<noteArr.length; i++) {
-    var currKey = localStorageKeys[i].replace(ns + '_', "") // StickyNote_123 => 123
-    if( db.exists(currKey)) {
-      var currNote = db.read(currKey);
-      if (currNote.id > highestId) highestId = currNote.id;
-      if (currNote.zindex > highestZ) highestZ = currNote.zindex;		
-      if(currNote.username != currentUser) continue; // Skip this note (not assigned to user)
-      var note = new Note();
-      note.id = currNote.id;
-      note.text = currNote.text;
-      note.timestamp =currNote.timestamp;
-      note.left = currNote.left;
-      note.top = currNote.top;
-      note.zIndex = currNote.zindex;
-      note.color = currNote.color;
-      note.setLeft(note.left);
-      note.setTop(note.top);
-      $(note.note).css('background-color', note.color);
-    }
+    var note = new Note();
+    note.id = noteArr[i]['noteid'];
+    note.text = noteArr[i]['text'];
+    note.timestamp = noteArr[i]['timestamp'];
+    note.left = noteArr[i]['left'];
+    note.top = noteArr[i]['top'];
+    note.zIndex = noteArr[i]['zIndex'];
+    note.color = noteArr[i]['color'];
+    note.setLeft(note.left);
+    note.setTop(note.top);
+    $(note.note).css('background-color', note.color);
+    if (note.id > highestId) highestId = note.id;
+    if (note.zIndex > highestZ) highestZ = note.zIndex;		
   }
 }
 
@@ -266,7 +262,7 @@ function newNote() {
   note.left = Math.round(Math.random() * 400) + 'px';
   note.top = Math.round(Math.random() * 500) + 'px';
   note.zIndex = ++highestZ;
-  note.username = currentUser;
+  note.username = 'unused';
   note.color = noteColor;
   note.saveAsNew();
 }
