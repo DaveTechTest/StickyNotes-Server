@@ -1,0 +1,44 @@
+<html>
+<head>
+  <title>Stricky Notes by Davis</title>
+  
+  <link rel="stylesheet" type="text/css" href="css/style.css" >
+  <link rel="stylesheet" type="text/css" href="css/msgBoxLight.css" >
+  <link rel="stylesheet" type="text/css" href="css/spectrum.css" >
+  
+  <script src='js/jquery-1.9.1.min.js'></script>
+  <script src='js/jquery.customSelect.js'></script>
+  <script src='js/jquery.msgBox.js'></script>
+  <script src='js/spectrum.js'></script>  
+  <script src='js/localstorage.js'></script>
+  <script src='js/stikynote.js'></script>
+  <script src='js/main.js'></script>
+</head>
+<body>
+  <input type='text' class="basic"/>
+  <button id="newNoteButton" onclick="newNote()">New Note</button>
+  
+  <!-- Name to appear one username is selected -->
+  <span id="chosen-name" class="color"></span>
+  
+  <!-- Dark Overlay Background -->
+  <div class="overlay" id="overlay" style="display:none;"></div>
+   
+  <!-- Overlay Box -->
+  <div class="box" id="box">
+    <a class="boxclose" id="boxclose"></a>
+    <h1>Please Select your Username</h1>
+    <div class="clear"></div>
+    <span id="userbox" class="customSelect" >
+      <select id="username" class="styled hasCustomSelect" size="1">
+         <option value="" selected="selected">Select a username</option>
+         <option value="Alice">Alice</option>
+         <option value="Cheshire">Cheshire</option>
+         <option value="Dormouse">Dormouse</option>
+         <option value="Bob">Bob</option>         
+         <option value="John Doe">John Doe</option>
+      </select>
+    </span>
+  </div>
+</body>
+</html>
