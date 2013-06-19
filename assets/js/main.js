@@ -7,5 +7,7 @@ $(function() {
   $('#username').val(""); // FireFox fix
   $('.customSelect').customSelect();
   loadNotes(); // Load archived noted
-  setInterval('updateNotes()', 5000) // Update notes (multi-user)
+  try {
+    setInterval('updateNotes()', 6000) // Update notes (multi-user)
+  } catch (e) {/* Can't read/update DOM tree */}
 });

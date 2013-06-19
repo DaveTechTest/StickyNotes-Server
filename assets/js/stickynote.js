@@ -270,30 +270,24 @@ function updateNotes() {
     $('.note').each(function(index) {
       var existingId = $(this).data('noteid');
       if(existingId == noteId) {
-        console.log("Updating note");
         found = true;
         // Existing Note
         var existingNote = $(this).find('.edit');
-        try {
-          // Try to check if this is the element be-eing edited
-          var hoverElement;
-          $('*').live('mouseenter', function() { hoverElement = this});
-          if (hoverElement != existingNote) {
-            existingNote.html(noteArr[i]['text']);
-          }
-        } catch(e) {/* Not inside a text box */}
-        
+        if($(existingNote).is(':focus') == false ) {
+          // Skip text update while user is typing
+          existingNote.html(noteArr[i]['text']);
+        }
         $(this).css('background-color', noteArr[i]['color']);
         $(this).css('left', noteArr[i]['left']);
         $(this).css('top', noteArr[i]['top']);        
         $(this).css('zIndex', noteArr[i]['zIndex']); 
-        $(this).data('noteid', noteId);          
-      }
+        $(this).data('noteid', noteId);       
+      } 
+      
     });
 
     if(found == false) {
       // New note
-      console.log("New Note!");
       var note = new Note();
       note.text = noteArr[i]['text'];
       note.timestamp = noteArr[i]['timestamp'];
@@ -303,12 +297,12 @@ function updateNotes() {
       note.color = noteArr[i]['color'];
       note.setLeft(note.left);
       note.setTop(note.top);
+      note.id = noteId;
       $(note.note).css('background-color', note.color);
       $(note.note).data('noteid', noteId);
-      console.log(">>> New note id:" +noteId);
     }
     if (noteArr[i]['zIndex'] > highestZ) highestZ = noteArr[i]['zIndex'];    
-    if (noteArr[i]['noteid']> highestId) highestId = noteArr[i]['noteid'];
+    // if (noteArr[i]['noteid']> highestId) highestId = noteArr[i]['noteid'];
   }
 
   // Check for removed Note
