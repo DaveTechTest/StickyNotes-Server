@@ -3,7 +3,7 @@
 class Note {
 
   /**
-   * Get all notes or one by id
+   * Get all notes
    */
   public function getNote($id) {
     global $db;
