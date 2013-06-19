@@ -1,26 +1,45 @@
 /** 
  * A sticky note object based on one of the webkit samples
- * and highly re-factored to use local storage instead
- * of Web SQL (Web SQL not compatible with Firefox and IE). 
- * Other additions includes note's background color and note 
- * per user.
+ * and highly re-factored to use mysql backed instead of Web SQL 
+ * Other additions includes note's background color.
  * 
  * Addition and re-factoring: Davis Desormeaux
  * License: WebKit is open source software with portions licensed under the LGPL and BSD licenses. 
  *
  **/
 
-var ns = "StickyNote", 
-    db = utils.storage,
-    noteColor = "#FFF046";
-    
-db.init(ns, true);
-//db.clear(); // Fix for Firefox when changing namespace (ns)...
+var noteColor = "#FFF046";
 
 var captured = null,
     highestZ = 0,
     highestId = 0,
     currentUser = "";
+
+function postData(uri, message) {
+  $.ajax({
+    type: "POST",
+    url: uri,
+    dataType: "json",
+    data: message, // message to send
+    success: function (data) { /* var obj = $.parseJSON(data); */ }
+  });
+}
+
+function getData(uri) {
+  var returnVal = false;
+  $.ajax({
+    type: "GET",
+    url: uri, /* + 'cache/'+  Math.floor(Math.random() * 99999), */
+    success: function(data) {
+      returnVal = data;
+    }, error : function() {
+      returnVal = false; 
+    }, 
+    async:false
+  });
+  return returnVal;
+  
+}
 
 function Note() {
   
@@ -143,27 +162,18 @@ Note.prototype = {
     }
 
     var note = this;
-    
-    if( db.exists(note.id) ) {
-      var newNote = db.read(note.id);
-      newNote.id   = note.id;
-      newNote.top  = note.top;
-      newNote.left = note.left;
-      newNote.text = note.text
-      newNote.color = note.color
-     
-      newNote.timestamp = note.timestamp;
-      var noteToSave = { id: newNote.id, username: newNote.username, color: note.color, left: newNote.left, top: newNote.top, zIndex: note.zIndex, text: newNote.text, timestamp: newNote.timestamp };
-      db.save(newNote.id, noteToSave);
-      // console.log(newNote);
-    }
+    newNote.timestamp = note.timestamp;
+    var noteToSave = { id: note.id, username: note.username, color: note.color, left: note.left, top: note.top, zIndex: note.zIndex, text: note.text, timestamp: note.timestamp };
+    postData('save-note/'+ note.id, noteToSave);
+
   },
 
   saveAsNew: function() {
     this.timestamp = new Date().getTime();
     var note = this;
     var noteToSave = { id: note.id, username: note.username, color: note.color, left: note.left, top: note.top, zIndex: note.zIndex, text: '', timestamp: note.timestamp };
-    db.save(note.id, noteToSave);
+    // db.save(note.id, noteToSave);
+    postData('save-note/', noteToSave);
   },
 
   onMouseDown: function(e) {
@@ -219,8 +229,11 @@ Note.prototype = {
  * Fetch notes assigned to username
  */
 function loadNotes(username) {
-  var localStorageKeys = Object.keys(localStorage);
-  for (var i=0; i<localStorageKeys.length; i++) {
+  
+  var noteArr = getData('read-note/');
+  console.log(noteArr);
+  return;
+  for (var i=0; i<noteArr.length; i++) {
     var currKey = localStorageKeys[i].replace(ns + '_', "") // StickyNote_123 => 123
     if( db.exists(currKey)) {
       var currNote = db.read(currKey);
