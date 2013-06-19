@@ -4,11 +4,11 @@ StickyNotes-Server
 Sticky-Note App using mysql backend
 ## Install
 
-To install, clone this repo and run the demo using your web-browser.
+To install, first clone this repo
 
 ```bash
-#> git clone https://github.com/DaveTechTest/StickyNotes-Server.git
-#> cd StickyNotes-Server
+prompt> git clone https://github.com/DaveTechTest/StickyNotes-Server.git
+prompt> cd StickyNotes-Server
 ```
 
 Create database and edit the following variable in **config.php**
