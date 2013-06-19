@@ -2,8 +2,6 @@ StickyNotes-Server
 ==================
 
 Sticky-Note App using mysql backend
-<<<<<<< HEAD
-
 ## Install
 
 To install, clone this repo and run the demo using your web-browser.
@@ -46,5 +44,3 @@ Run the app by visiting http://www.app-url.com/ in your web-browser.
 ## Screenshot
 
 ![alt text](http://stickynotes.6te.net/screenshot-server.png "StickyNote-Local Screenshot")
-=======
->>>>>>> 6812c4b81f7c47564f7a579d40fe6937d5edcce1
