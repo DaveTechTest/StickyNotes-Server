@@ -273,14 +273,16 @@ function updateNotes() {
         found = true;
         // Existing Note
         var existingNote = $(this).find('.edit');
-        if($(existingNote).is(':focus') == false ) {
+        var activeNoteId = $(document.activeElement).parent().data('noteid');
+
+        if($(existingNote).is(':focus') == false && activeNoteId != existingId){
           // Skip text update while user is typing
-          existingNote.html(noteArr[i]['text']);
+          existingNote.html(noteArr[i]['text']);     
         }
         $(this).css('background-color', noteArr[i]['color']);
         $(this).css('left', noteArr[i]['left']);
         $(this).css('top', noteArr[i]['top']);        
-        $(this).css('zIndex', noteArr[i]['zIndex']); 
+        $(this).css('zIndex', noteArr[i]['zIndex']);
         $(this).data('noteid', noteId);       
       } 
       
