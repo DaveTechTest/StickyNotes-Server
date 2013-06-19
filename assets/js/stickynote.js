@@ -44,8 +44,11 @@ function getData(uri) {
 function Note() {
   
   var self = this;
+
   var note = document.createElement('div');
+
   $(note).css('background-color', noteColor);
+  
   note.className = 'note';
   note.addEventListener('mousedown', function(e) { return self.onMouseDown(e) }, false);
   note.addEventListener('click', function() { return self.onNoteClick() }, false);
@@ -69,9 +72,9 @@ function Note() {
   note.appendChild(ts);
   this.lastModified = ts;
 
-
+  
   document.body.appendChild(note);
-
+  
   return this;
 }
 
@@ -107,7 +110,6 @@ Note.prototype = {
     this.lastModified.textContent = modifiedString(date);
   },
 
-
   getLeft: function() {
     return this.note.style.left;
   },
@@ -136,7 +138,6 @@ Note.prototype = {
     this.cancelPendingSave();
     var note = this;
     var noteId = parseInt(note.id);
-    console.log(noteId);
     postData('delete-note/'+ noteId, false);
     var duration = .25
     var self = this;
@@ -175,6 +176,7 @@ Note.prototype = {
     var note = this;
     var noteToSave = { id: note.id, username: note.username, color: note.color, left: note.left, top: note.top, zIndex: note.zIndex, text: '', timestamp: note.timestamp };
     // db.save(note.id, noteToSave);
+    $(note.note).data('noteid', note.id);
     postData('save-note/', noteToSave);
   },
 
@@ -246,9 +248,77 @@ function loadNotes() {
     note.setLeft(note.left);
     note.setTop(note.top);
     $(note.note).css('background-color', note.color);
+    $(note.note).data('noteid', note.id);
     if (note.id > highestId) highestId = note.id;
     if (note.zIndex > highestZ) highestZ = note.zIndex;		
   }
+}
+
+
+/**
+ * Updates notes if another currently logged-in user add/remove or change a note
+ */
+function updateNotes() {
+  
+  var noteArr = getData('read-note/');
+  if(noteArr != false && noteArr != "") noteArr = JSON.parse(noteArr); 
+  var idArr = [];
+  for (var i=0; i<noteArr.length; i++) {
+    var found = false;
+    var noteId = noteArr[i]['noteid'];
+    idArr.push(noteId);
+    $('.note').each(function(index) {
+      var existingId = $(this).data('noteid');
+      if(existingId == noteId) {
+        console.log("Updating note");
+        found = true;
+        // Existing Note
+        var existingNote = $(this).find('.edit');
+        try {
+          // Try to check if this is the element be-eing edited
+          var hoverElement;
+          $('*').live('mouseenter', function() { hoverElement = this});
+          if (hoverElement != existingNote) {
+            existingNote.html(noteArr[i]['text']);
+          }
+        } catch(e) {/* Not inside a text box */}
+        
+        $(this).css('background-color', noteArr[i]['color']);
+        $(this).css('left', noteArr[i]['left']);
+        $(this).css('top', noteArr[i]['top']);        
+        $(this).css('zIndex', noteArr[i]['zIndex']); 
+        $(this).data('noteid', noteId);          
+      }
+    });
+
+    if(found == false) {
+      // New note
+      console.log("New Note!");
+      var note = new Note();
+      note.text = noteArr[i]['text'];
+      note.timestamp = noteArr[i]['timestamp'];
+      note.left = noteArr[i]['left'];
+      note.top = noteArr[i]['top'];
+      note.zIndex = noteArr[i]['zIndex'];
+      note.color = noteArr[i]['color'];
+      note.setLeft(note.left);
+      note.setTop(note.top);
+      $(note.note).css('background-color', note.color);
+      $(note.note).data('noteid', noteId);
+      console.log(">>> New note id:" +noteId);
+    }
+    if (noteArr[i]['zIndex'] > highestZ) highestZ = noteArr[i]['zIndex'];    
+    if (noteArr[i]['noteid']> highestId) highestId = noteArr[i]['noteid'];
+  }
+
+  // Check for removed Note
+  $('.note').each(function(index) {
+    if($.inArray($(this).data('noteid'), idArr) == -1) {
+      // Found a note that was deleted
+      $(this).remove();
+      return false;
+    }
+  });
 }
 
 function modifiedString(date) {

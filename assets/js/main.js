@@ -6,5 +6,6 @@ $(function() {
 
   $('#username').val(""); // FireFox fix
   $('.customSelect').customSelect();
-  loadNotes();
+  loadNotes(); // Load archived noted
+  setInterval('updateNotes()', 5000) // Update notes (multi-user)
 });
